@@ -23,5 +23,21 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    // Relationship untuk likes
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
 
+    // Relationship untuk albums
+    public function albums()
+    {
+        return $this->hasMany(Album::class);
+    }
+
+    // Relationship untuk photos
+    public function photos()
+    {
+        return $this->hasMany(Photo::class);
+    }
 }

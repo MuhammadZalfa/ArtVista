@@ -3,6 +3,7 @@
 @section('title', 'ArtVista')
 
 @section('content')
+
 <nav id="navbar" class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-md">  
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">  
         <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">  
@@ -148,23 +149,27 @@
             </div>
         </div>
     
-        <div class="bg-gray-100 p-4 rounded-lg">
-          <h3 class="text-xl font-semibold">Detail Profil</h3>
-          <div class="flex flex-col space-y-4 mt-4">
-              <div>
-                  <p class="text-sm text-gray-600">Total Likes</p>
-                  <p class="font-semibold">{{ $user->likes_count }}</p>
-              </div>
-              <div>
-                  <p class="text-sm text-gray-600">Total Albums</p>
-                  <p class="font-semibold">{{ $user->albums_count }}</p>
-              </div>
-              <div>
-                  <p class="text-sm text-gray-600">Total Photos</p>
-                  <p class="font-semibold">{{ $user->photos_count }}</p>
-              </div>
-          </div>
-      </div>
+        @php
+        $userStats = auth()->user()->loadCount(['likes', 'albums', 'photos']);
+    @endphp
+    
+    <div class="bg-gray-100 p-4 rounded-lg">
+        <h3 class="text-xl font-semibold">Detail Profil</h3>
+        <div class="flex flex-col space-y-4 mt-4">
+            <div>
+                <p class="text-sm text-gray-600">Total Likes</p>
+                <p class="font-semibold">{{ $userStats->likes_count }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Total Albums</p>
+                <p class="font-semibold">{{ $userStats->albums_count }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Total Photos</p>
+                <p class="font-semibold">{{ $userStats->photos_count }}</p>
+            </div>
+        </div>
+    </div>
     
           <!-- Action Buttons -->
           <div class="mt-4 flex space-x-4">
@@ -174,101 +179,200 @@
         </div>
     
         <!-- Right Side: My Albums Section -->
-        <div class="md:col-span-3 space-y-6">
-          <!-- Add Album Button -->
-          <div class="flex justify-between items-center">
-            <h3 class="text-xl font-semibold">My Albums</h3>
-            <button id="openModal" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Tambah Album</button>
-          </div>
-    
-          <!-- Albums Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            <!-- Album 1 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-              <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-              <h4 class="font-semibold mt-2">Vacation 2023</h4>
-              <p class="text-sm text-gray-600">Photos from my summer vacation</p>
-              <!-- Edit and Delete Buttons -->
-              <div class="absolute bottom-2 right-2 flex space-x-2">
+<div class="md:col-span-3 space-y-6">
+  <div class="flex justify-between items-center">
+      <h3 class="text-xl font-semibold">My Albums</h3>
+      <button id="openModal" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Tambah Album</button>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+    @php
+    use App\Models\Photo;
+    @endphp 
+    @forelse($albums as $album)
+        <div class="bg-gray-200 p-4 rounded-lg relative">
+            <a href="{{ route('adminAlbum', $album->album_id) }}">
+                @php
+                    $firstPhoto = Photo::where('album_id', $album->album_id)->first();
+                @endphp
+                @if($firstPhoto)
+                    <img src="{{ asset('storage/' . $firstPhoto->image_path) }}" 
+                         alt="{{ $album->title }}" 
+                         class="w-full h-48 object-cover rounded-t-lg">
+                @else
+                    <img src="/api/placeholder/150/150" 
+                         alt="No Photos" 
+                         class="w-full h-48 object-cover rounded-t-lg">
+                @endif
+                <h4 class="font-semibold mt-2">{{ $album->title }}</h4>
+                <p class="text-sm text-gray-600">{{ $album->description }}</p>
+            </a>
+            <div class="absolute bottom-2 right-2 flex space-x-2">
                 <button class="text-yellow-500 p-2 rounded-full">
-                  <i class="fas fa-pencil-alt"></i>
+                    <i class="fas fa-pencil-alt"></i>
                 </button>
                 <button class="text-red-500 p-2 rounded-full">
-                  <i class="fas fa-trash"></i>
+                    <i class="fas fa-trash"></i>
                 </button>
-              </div>
             </div>
-    
-            <!-- Album 2 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-              <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-              <h4 class="font-semibold mt-2">Family Moments</h4>
-              <p class="text-sm text-gray-600">Cherished memories with family</p>
-              <!-- Edit and Delete Buttons -->
-              <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-    
-            <!-- Album 3 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-              <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-              <h4 class="font-semibold mt-2">Nature Photography</h4>
-              <p class="text-sm text-gray-600">Exploring the beauty of nature</p>
-              <!-- Edit and Delete Buttons -->
-              <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
-    
+    @empty
+        <div class="col-span-3 text-center py-8">
+            <div class="bg-gray-100 rounded-lg p-6">
+                <p class="text-gray-600 text-lg">Belum ada album yang dibuat</p>
+                <p class="text-gray-500 mt-2">Klik tombol "Tambah Album" untuk membuat album baru</p>
+            </div>
+        </div>
+    @endforelse
+</div>
+</div>
+      
+      <!-- Modal -->
+      <div id="albumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+          <div class="bg-white p-6 rounded-lg w-1/3">
+              <h2 class="text-xl font-semibold mb-4">Tambah Album</h2>
+              <form id="albumForm">
+                  @csrf
+                  <div class="mb-4">
+                    <label for="albumTitle" class="block text-sm text-gray-600">Nama Album</label>
+                    <input type="text" id="albumTitle" name="title" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                </div>
+                <div class="mb-4">
+                    <label for="albumDescription" class="block text-sm text-gray-600">Deskripsi Album</label>
+                    <textarea id="albumDescription" name="description" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></textarea>
+                </div>
+                  <div class="flex justify-end space-x-4">
+                      <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Batal</button>
+                      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Simpan</button>
+                  </div>
+              </form>
+          </div>
       </div>
-    </div>
-    
-    <!-- Modal for Adding Album -->
-    <div id="albumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-      <div class="bg-white p-6 rounded-lg w-1/3">
-        <h2 class="text-xl font-semibold mb-4">Tambah Album</h2>
-        <form>
-          <div class="mb-4">
-            <label for="albumName" class="block text-sm text-gray-600">Nama Album</label>
-            <input type="text" id="albumName" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-          </div>
-          <div class="mb-4">
-            <label for="albumDescription" class="block text-sm text-gray-600">Deskripsi Album</label>
-            <textarea id="albumDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
-          </div>
-          <div class="flex justify-end space-x-4">
-            <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Batal</button>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Simpan</button>
-          </div>
-        </form>
-      </div>
-    </div>
-    
-    <script>
-      // Modal logic
-      const openModalButton = document.getElementById('openModal');
-      const closeModalButton = document.getElementById('closeModal');
-      const modal = document.getElementById('albumModal');
-    
-      openModalButton.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-      });
-    
-      closeModalButton.addEventListener('click', () => {
-        modal.classList.add('hidden');
-      });
-    </script>
+      <!-- Di bagian head layout -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+        // DOM Elements
+        const openModalButton = document.getElementById('openModal');
+        const closeModalButton = document.getElementById('closeModal');
+        const modal = document.getElementById('albumModal');
+        const albumForm = document.getElementById('albumForm');
+        
+        // Open modal handler
+        openModalButton.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+        });
+        
+        // Close modal handler
+        closeModalButton.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            albumForm.reset(); // Reset form when closing
+        });
+        
+        // Close modal if clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                albumForm.reset();
+            }
+        });
+        
+        // Escape key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                albumForm.reset();
+            }
+        });
+        
+        // Form submission handler
+        albumForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Disable submit button to prevent double submission
+            const submitButton = albumForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            
+            try {
+                // Get form data
+                const formData = new FormData(albumForm);
+                
+                // Add CSRF token
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                
+                // Send request
+                const response = await fetch('/admin/album', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+        
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Success handling
+                    modal.classList.add('hidden');
+                    albumForm.reset();
+                    
+                    // Show success message
+                    alert('Album berhasil ditambahkan');
+                    
+                    // Reload page to show new album
+                    window.location.reload();
+                } else {
+                    // Error handling
+                    throw new Error(data.message || 'Gagal membuat album');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+            } finally {
+                // Re-enable submit button
+                submitButton.disabled = false;
+            }
+        });
+        
+        // Input validation
+        const albumTitle = document.getElementById('albumTitle');
+        const albumDescription = document.getElementById('albumDescription');
+        
+        // Real-time validation
+        const validateInput = (input, minLength = 3) => {
+            const value = input.value.trim();
+            
+            if (value.length < minLength) {
+                input.classList.add('border-red-500');
+                return false;
+            } else {
+                input.classList.remove('border-red-500');
+                return true;
+            }
+        };
+        
+        albumTitle.addEventListener('input', () => validateInput(albumTitle));
+        albumDescription.addEventListener('input', () => validateInput(albumDescription));
+        
+        // Form validation before submit
+        albumForm.addEventListener('submit', (e) => {
+            const isTitleValid = validateInput(albumTitle);
+            const isDescriptionValid = validateInput(albumDescription);
+            
+            if (!isTitleValid || !isDescriptionValid) {
+                e.preventDefault();
+                alert('Mohon isi semua field dengan benar');
+            }
+        });
+        
+        // Helper function to show error messages
+        const showError = (message) => {
+            alert(message);
+        };
+        
+        // Helper function to handle network errors
+        const handleNetworkError = (error) => {
+            console.error('Network Error:', error);
+            showError('Terjadi kesalahan jaringan. Silakan coba lagi.');
+        };
+        </script>
 @endsection

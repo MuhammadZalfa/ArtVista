@@ -139,7 +139,7 @@
     </div>
     <div id="fotoGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
         <div class="grid gap-4">
-            <a href="{{ route('adminBuka') }}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -148,7 +148,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{ route('adminBuka') }}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -157,7 +157,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{ route('adminBuka') }}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -168,7 +168,7 @@
             </a>
         </div>
         <div class="grid gap-4">
-            <a href="{{ route('adminBuka') }}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -177,7 +177,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{ route('adminBuka') }}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -186,7 +186,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{ route('adminBuka') }}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -197,7 +197,7 @@
             </a>
         </div>
         <div class="grid gap-4">
-            <a href="{{route('adminBuka')}}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -206,7 +206,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{route('adminBuka')}}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-7.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -215,7 +215,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{route('adminBuka')}}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-8.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -226,7 +226,7 @@
             </a>
         </div>
         <div class="grid gap-4">
-            <a href="{{route('adminBuka')}}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-9.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -235,7 +235,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{route('adminBuka')}}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-10.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
@@ -244,7 +244,7 @@
                     </div>
                 </div>
             </a>
-            <a href="{{route('adminBuka')}}" class="relative group">
+            <a href="" class="relative group">
                 <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-11.jpg" alt="">
                 <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     <div class="flex justify-between absolute bottom-4 left-4 right-4">
