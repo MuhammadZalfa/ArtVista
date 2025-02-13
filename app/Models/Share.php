@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Like extends Model
+class Share extends Model
 {
-    protected $fillable = ['user_id', 'photo_id'];
+    protected $fillable = ['user_id', 'photo_id', 'share_type'];
 
     public function photo()
     {
@@ -14,6 +15,6 @@ class Like extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class);
     }
 }

@@ -29,7 +29,17 @@
           <div class="relative hidden md:block">  
               <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">  
                   <span class="sr-only">Open user menu</span>  
-                  <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                  @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif
               </button>  
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">  
                   <div class="px-4 py-3">  
@@ -90,7 +100,17 @@
               @auth
               <li class="md:hidden border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">  
                   <div class="flex items-center px-4 py-2 space-x-3">  
-                      <img class="w-10 h-10 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                    @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif
                       <div>  
                           <span class="block text-sm text-gray-900 dark:text-white">{{ Auth::user()->name }}</span>  
                           <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ Auth::user()->email }}</span>  
@@ -101,9 +121,12 @@
                   <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>  
               </li>  
               <li class="md:hidden">  
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" id="logoutForm">
                     @csrf
-                    <a href="{{ route('logout') }}" onclick="confirmLogout(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                    <button type="submit" onclick="confirmLogout(event)" 
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white w-full text-left">
+                        Sign out
+                    </button>
                 </form>
               </li>
               @endauth
@@ -120,73 +143,35 @@
   </div>  
 </nav>
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 p-4">
-  <!-- Album 1 -->
-  <div class="bg-gray-200 p-4 rounded-lg relative">
-      <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-      <h4 class="font-semibold mt-2">Vacation 2023</h4>
-      <p class="text-sm text-gray-600">Photos from my summer vacation</p>
-      <p class="text-xs text-gray-500">Created by: <span class="font-semibold text-gray-800">John Doe</span></p> <!-- Creator Info -->
-      <!-- Edit and Delete Buttons -->
-      <div class="absolute bottom-2 right-2 flex space-x-2">
-          <button class="text-yellow-500 p-2 rounded-full">
-              <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="text-red-500 p-2 rounded-full">
-              <i class="fas fa-trash"></i>
-          </button>
-      </div>
-  </div>
-
-  <!-- Album 2 -->
-  <div class="bg-gray-200 p-4 rounded-lg relative">
-      <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-      <h4 class="font-semibold mt-2">Family Moments</h4>
-      <p class="text-sm text-gray-600">Cherished memories with family</p>
-      <p class="text-xs text-gray-500">Created by: <span class="font-semibold text-gray-800">Jane Smith</span></p> <!-- Creator Info -->
-      <!-- Edit and Delete Buttons -->
-      <div class="absolute bottom-2 right-2 flex space-x-2">
-          <button class="text-yellow-500 p-2 rounded-full">
-              <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="text-red-500 p-2 rounded-full">
-              <i class="fas fa-trash"></i>
-          </button>
-      </div>
-  </div>
-
-  <!-- Album 3 -->
-  <div class="bg-gray-200 p-4 rounded-lg relative">
-      <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-      <h4 class="font-semibold mt-2">Nature Photography</h4>
-      <p class="text-sm text-gray-600">Exploring the beauty of nature</p>
-      <p class="text-xs text-gray-500">Created by: <span class="font-semibold text-gray-800">Chris Johnson</span></p> <!-- Creator Info -->
-      <!-- Edit and Delete Buttons -->
-      <div class="absolute bottom-2 right-2 flex space-x-2">
-          <button class="text-yellow-500 p-2 rounded-full">
-              <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="text-red-500 p-2 rounded-full">
-              <i class="fas fa-trash"></i>
-          </button>
-      </div>
-  </div>
-
-  <!-- Album 4 -->
-  <div class="bg-gray-200 p-4 rounded-lg relative">
-      <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-      <h4 class="font-semibold mt-2">City Lights</h4>
-      <p class="text-sm text-gray-600">Exploring the city's vibrant night life</p>
-      <p class="text-xs text-gray-500">Created by: <span class="font-semibold text-gray-800">Alice Brown</span></p> <!-- Creator Info -->
-      <!-- Edit and Delete Buttons -->
-      <div class="absolute bottom-2 right-2 flex space-x-2">
-          <button class="text-yellow-500 p-2 rounded-full">
-              <i class="fas fa-pencil-alt"></i>
-          </button>
-          <button class="text-red-500 p-2 rounded-full">
-              <i class="fas fa-trash"></i>
-          </button>
-      </div>
-  </div>
+    @foreach($albums as $album)
+    <div class="bg-gray-200 p-4 rounded-lg relative">
+        @if($album->photos()->whereNull('deleted_at')->first())
+            <img 
+                src="{{ asset('storage/' . $album->photos()->whereNull('deleted_at')->first()->image_path) }}" 
+                alt="Album Thumbnail" 
+                class="w-full h-48 object-cover rounded-t-lg" 
+                onclick="window.location.href='{{ route('album', $album->album_id) }}'"
+            >
+        @else
+            <div 
+                class="w-full h-48 bg-gray-300 rounded-t-lg flex items-center justify-center cursor-pointer"
+                onclick="window.location.href='{{ route('album', $album->album_id) }}'"
+            >
+                <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+        @endif
+        <h4 class="font-semibold mt-2">{{ $album->title }}</h4>
+        <p class="text-sm text-gray-600">{{ Str::limit($album->description, 30) }}</p>
+        <p class="text-xs text-gray-500">Created by: <span class="font-semibold text-gray-800">{{ $album->user->name }}</span></p>
+        
+        <!-- Photo Count Badge -->
+        <div class="absolute top-2 right-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-full">
+            {{ $album->photos_count }} photos
+        </div>
+    </div>
+    @endforeach
 </div>
 
 @endsection

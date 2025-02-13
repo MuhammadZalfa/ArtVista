@@ -39,186 +39,90 @@
     </div>  
 </header>  
 
-<!-- Add margin here to create space between sections -->  
-<!-- Add margin here to create space between sections -->  
 <section class="mt-8">
     <div class="flex flex-wrap justify-center space-x-4">
-        <!-- Album 1 -->
-        <div class="max-w-xs w-full bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
-            <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-            <div class="p-5">
-                <h4 class="font-semibold mt-2 text-xl text-gray-800">Vacation 2023</h4>
-                <p class="text-sm text-gray-600">Photos from my summer vacation</p>
-                <p class="text-xs text-gray-500 mt-2">Created by: <span class="font-semibold text-gray-800">John Doe</span></p> <!-- Creator Info -->
+        @forelse($albums as $album)
+            <div class="max-w-xs w-full bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative mb-4">
+                @if($album->photos()->whereNull('deleted_at')->first())
+            <img 
+                src="{{ asset('storage/' . $album->photos()->whereNull('deleted_at')->first()->image_path) }}" 
+                alt="Album Thumbnail" 
+                class="w-full h-48 object-cover rounded-t-lg" 
+                onclick="window.location.href='{{ route('album', $album->album_id) }}'"
+            >
+        @else
+            <div 
+                class="w-full h-48 bg-gray-300 rounded-t-lg flex items-center justify-center cursor-pointer"
+                onclick="window.location.href='{{ route('album', $album->album_id) }}'"
+            >
+                <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
             </div>
-            <!-- Edit and Delete Buttons -->
-            <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-trash"></i>
-                </button>
+        @endif
+                <div class="p-5">
+                    <h4 class="font-semibold mt-2 text-xl text-gray-800">{{ $album->title }}</h4>
+                    <p class="text-sm text-gray-600">{{ Str::limit($album->description, 30) }}</p>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Created by: <span class="font-semibold text-gray-800">{{ $album->user->username }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Total Photos: {{ $album->photos_count }}
+                    </p>
+                </div>
             </div>
-        </div>
-
-        <!-- Album 2 -->
-        <div class="max-w-xs w-full bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
-            <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-            <div class="p-5">
-                <h4 class="font-semibold mt-2 text-xl text-gray-800">Family Moments</h4>
-                <p class="text-sm text-gray-600">Cherished memories with family</p>
-                <p class="text-xs text-gray-500 mt-2">Created by: <span class="font-semibold text-gray-800">Jane Smith</span></p> <!-- Creator Info -->
+        @empty
+            <div class="w-full text-center text-gray-500 py-4">
+                Belum ada album. Buat album pertamamu sekarang!
             </div>
-            <!-- Edit and Delete Buttons -->
-            <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Album 3 -->
-        <div class="max-w-xs w-full bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
-            <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-            <div class="p-5">
-                <h4 class="font-semibold mt-2 text-xl text-gray-800">Nature Photography</h4>
-                <p class="text-sm text-gray-600">Exploring the beauty of nature</p>
-                <p class="text-xs text-gray-500 mt-2">Created by: <span class="font-semibold text-gray-800">Chris Johnson</span></p> <!-- Creator Info -->
-            </div>
-            <!-- Edit and Delete Buttons -->
-            <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Album 4 -->
-        <div class="max-w-xs w-full bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
-            <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-            <div class="p-5">
-                <h4 class="font-semibold mt-2 text-xl text-gray-800">City Lights</h4>
-                <p class="text-sm text-gray-600">Exploring the city's vibrant nightlife</p>
-                <p class="text-xs text-gray-500 mt-2">Created by: <span class="font-semibold text-gray-800">Alice Brown</span></p> <!-- Creator Info -->
-            </div>
-            <!-- Edit and Delete Buttons -->
-            <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full bg-white shadow-lg hover:bg-gray-200">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pagination Section -->
-    <div class="flex justify-center mt-6">
-        <nav aria-label="Page navigation example">
-            <ul class="inline-flex -space-x-px">
-                <li>
-                    <button id="prevBtn" class="px-3 py-2 ml-0 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" aria-label="Previous" onclick="changeCard(-1)">
-                        <span aria-hidden="true">&laquo;</span>
-                    </button>
-                </li>
-                <li>
-                    <button id="page1" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" onclick="showCard(0)">1</button>
-                </li>
-                <li>
-                    <button id="page2" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" onclick="showCard(1)">2</button>
-                </li>
-                <li>
-                    <button id="page3" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" onclick="showCard(2)">3</button>
-                </li>
-                <li>
-                    <button id="nextBtn" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" aria-label="Next" onclick="changeCard(1)">
-                        <span aria-hidden="true">&raquo;</span>
-                    </button>
-                </li>
-            </ul>
-        </nav>
+        @endforelse
     </div>
 </section>
 
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8"> <!-- Add margin here as well -->  
-    <div class="grid gap-4">  
-        <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg" alt="">  
-        </a>  
-        <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg" alt="">  
-        </a>  
-        <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg" alt="">  
-        </a>  
-    </div>  
-    <div class="grid gap-4">  
-        <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg" alt="">  
-        </a>  
-        <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg" alt="">  
-        </a>  
-        <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg" alt="">  
-        </a>  
-    </div>  
-    <div class="grid gap-4">  
-        <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg" alt="">  
-        </a>  
-        <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-7.jpg" alt="">  
-        </a>  
-        <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-8.jpg" alt="">  
-        </a>  
-    </div>  
-    <div class="grid gap-4">  
-        <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-9.jpg" alt="">  
-        </a>  
-        <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-10.jpg" alt="">  
-        </a>  
-        <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-            <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-11.jpg" alt="">  
-        </a>  
-    </div>  
-    <!-- Lanjutkan pola ini untuk semua elemen gambar lainnya -->
+<div id="fotoGrid" class="w-full px-4 py-8">
+    @if($photos->count() > 0)
+    <div class="columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+        @foreach($photos as $photo)
+        <div class="break-inside-avoid mb-6">
+            <a href="{{ route('buka', $photo->photo_id) }}" 
+               class="block transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+                <img class="w-full h-auto rounded-lg object-cover"
+                     src="{{ asset('storage/' . $photo->image_path) }}"
+                     alt="{{ $photo->title }}"
+                     title="{{ $photo->description }}">
+            </a>
+        </div>
+        @endforeach
+    </div>
+    @else
+    <div class="text-center py-8">
+        <p class="text-gray-500">No photos found</p>
+    </div>
+    @endif
 </div>
 
-<script>  
-    let currentCardIndex = 0;  
-    const cards = document.querySelectorAll('.card');  
+<script>
+    function editAlbum(albumId) {
+        // Implement edit album logic
+        window.location.href = `/admin/album/${albumId}/edit`;
+    }
 
-    function showCard(index) {  
-        cards.forEach((card, i) => {  
-            card.classList.remove('active');  
-            if (i === index) {  
-                card.classList.add('active');  
-            }  
-        });  
-        currentCardIndex = index;  
-    }  
-
-    function changeCard(direction) {  
-        const newIndex = currentCardIndex + direction;  
-        if (newIndex >= 0 && newIndex < cards.length) {  
-            showCard(newIndex);  
-        }  
-    }  
-
-    // Initialize the first card  
-    showCard(currentCardIndex);  
-</script>  
+    function deleteAlbum(albumId) {
+        if(confirm('Apakah Anda yakin ingin menghapus album ini?')) {
+            // Implement delete album logic
+            fetch(`/admin/album/${albumId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if(response.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+</script>
 @endsection

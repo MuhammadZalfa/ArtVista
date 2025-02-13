@@ -1,55 +1,51 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; // Add this line
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Photo extends Model
 {
-    use SoftDeletes; // Add this line
-    
-    protected $table = 'photos';
+    use SoftDeletes;
+
     protected $primaryKey = 'photo_id';
+    protected $fillable = ['album_id', 'user_id', 'title', 'description', 'image_path'];
 
-    protected $fillable = [
-        'album_id',
-        'user_id',
-        'title',
-        'category',
-        'description',
-        'image_path'
-    ];
+    public function likes()
+    {
+        return $this->hasMany(Like::class, 'photo_id', 'photo_id');
+    }
 
-    protected $dates = ['deleted_at']; // Add this line
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'photo_id', 'photo_id');
+    }
 
-    // Daftar kategori yang tersedia
-    public static $categories = [
-        'landscape' => 'Landscape & Nature',
-        'portrait' => 'Portrait & People',
-        'architecture' => 'Architecture & Urban',
-        'events' => 'Events & Occasions',
-        'lifestyle' => 'Lifestyle & Fashion',
-        'food' => 'Food & Cuisine',
-        'art' => 'Art & Abstract',
-        'product' => 'Product & Commercial',
-        'travel' => 'Travel & Adventure',
-        'automotive' => 'Automotive & Transport',
-        'wildlife' => 'Wildlife & Animals',
-        'sports' => 'Sports & Action',
-        'documentary' => 'Documentary & Stories',
-        'aerial' => 'Aerial & Drone',
-        'night' => 'Night & Low Light',
-        'underwater' => 'Underwater & Marine'
-    ];
+    public function shares()
+    {
+        return $this->hasMany(Share::class, 'photo_id', 'photo_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'photo_category', 'photo_id', 'category_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
     public function album()
     {
         return $this->belongsTo(Album::class, 'album_id', 'album_id');
     }
 
-    public function user()
+    // Scope untuk menghitung jumlah likes
+    public function scopeWithLikesCount($query)
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $query->withCount(['likes' => function($q) {
+            $q->where('photo_id', $this->photo_id);
+        }]);
     }
 }

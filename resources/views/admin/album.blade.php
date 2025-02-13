@@ -3,12 +3,61 @@
 @section('title', 'ArtVista')
 
 @section('content')
+<style>
+    select[multiple] {
+        min-height: 120px;
+        padding: 8px;
+    }
+    
+    select[multiple] option {
+        padding: 8px;
+        margin: 2px 0;
+        border-radius: 4px;
+    }
+    
+    select[multiple] option:checked {
+        background: #3b82f6 linear-gradient(0deg, #3b82f6 0%, #3b82f6 100%);
+        color: white;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        margin: 0.25rem;
+        background-color: #e5e7eb;
+        color: #374151;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+
+    .remove-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 0.5rem;
+        padding: 0.125rem 0.375rem;
+        background-color: transparent;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        font-size: 1rem;
+        line-height: 1;
+        border-radius: 9999px;
+    }
+
+    .remove-pill:hover {
+        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+</style>
 <nav id="navbar" class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-md">  
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">  
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">  
-            <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />  
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>  
-        </a>  
+        <a href="{{ route('admin') }}" class="flex items-center space-x-3 rtl:space-x-reverse">  
+            <img src="{{asset('images/logo.png')}}" class="h-8" alt="Flowbite Logo" />  
+            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ArtVista</span>  
+        </a>    
         <div class="flex items-center md:order-2 space-x-3 md:space-x-4 rtl:space-x-reverse">  
             <button type="button" data-collapse-toggle="navbar-search" aria-controls="navbar-search" aria-expanded="false" class="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 me-1">  
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">  
@@ -146,15 +195,15 @@
     @if($photos->count() > 0)
     <div class="columns-2 md:columns-3 lg:columns-4 gap-3 mt-8">
         @foreach($photos as $photo)
-            <div class="break-inside-avoid mb-3">
-                <a href="{{ route('adminBuka', $photo->photo_id) }}" class="block hover:scale-[1.02] hover:shadow-lg duration-300">
-                    <img class="w-full h-auto rounded-lg"
-                         src="{{ asset('storage/' . $photo->image_path) }}"
-                         alt="{{ $photo->title }}"
-                         title="{{ $photo->description }}">
-                </a>
-            </div>
-        @endforeach
+        <div class="break-inside-avoid mb-3">
+            <a href="{{ route('adminBuka', $photo->photo_id) }}" class="block hover:scale-[1.02] hover:shadow-lg duration-300">
+                <img class="w-full h-auto rounded-lg"
+                     src="{{ asset('storage/' . $photo->image_path) }}"
+                     alt="{{ $photo->title }}"
+                     title="{{ $photo->description }}">
+            </a>
+        </div>
+    @endforeach
     </div>
     @else
 
@@ -192,7 +241,7 @@
             <input type="hidden" name="album_id" value="{{ $album->album_id }}">
             
             <div class="grid grid-cols-3 gap-6">
-                <!-- Image Upload Area - Left Column (2/3 width) -->
+                <!-- Image Upload Area -->
                 <div class="col-span-2 flex justify-center items-center bg-gray-100 border-4 border-dashed border-gray-300 p-6 relative rounded-lg h-full">
                     <div class="w-full text-center">
                         <div id="drop-area" class="p-4 border-2 border-dashed border-blue-600 rounded-lg cursor-pointer">
@@ -203,52 +252,50 @@
                                 <i class="fas fa-cloud-upload-alt text-4xl text-gray-600 mb-2"></i>
                                 <p class="text-gray-600">Click to upload image</p>
                             </div>
-                            <input type="file" name="image" id="image-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                                   accept="image/*" required>
+                            <input type="file" name="image" id="image-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/*" required>
                         </div>
                         @error('image')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
-
-                <!-- Image Details - Right Column (1/3 width) -->
+        
+                <!-- Image Details -->
                 <div class="space-y-4">
                     <div class="mb-4">
                         <label for="imageTitle" class="block text-sm text-gray-600">Image Title</label>
-                        <input type="text" name="title" id="imageTitle" 
-                               class="w-full px-3 py-1.5 border border-gray-300 rounded-lg mt-1 text-sm @error('title') border-red-500 @enderror" 
-                               placeholder="Enter title" value="{{ old('title') }}" required>
+                        <input type="text" name="title" id="imageTitle" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg mt-1 text-sm @error('title') border-red-500 @enderror" placeholder="Enter title" value="{{ old('title') }}" required>
                         @error('title')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                    
                     <div>
                         <label for="imageDescription" class="block text-sm text-gray-600">Description</label>
-                        <textarea name="description" id="imageDescription" 
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg mt-2 @error('description') border-red-500 @enderror" 
-                                  placeholder="Enter description" rows="4">{{ old('description') }}</textarea>
+                        <textarea name="description" id="imageDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg mt-2 @error('description') border-red-500 @enderror" placeholder="Enter description" rows="4">{{ old('description') }}</textarea>
                         @error('description')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <!-- Tambahkan Category Dropdown -->
-                    <div class="mb-4">
-                        <label for="category" class="block text-sm text-gray-600">Category</label>
-                        <select name="category" id="category" 
-                                class="w-full px-3 py-1.5 border border-gray-300 rounded-lg mt-1 text-sm @error('category') border-red-500 @enderror" 
-                                required>
-                            <option value="">Select Category</option>
-                            @foreach(App\Models\Photo::$categories as $value => $label)
-                                <option value="{{ $value }}" {{ old('category') == $value ? 'selected' : '' }}>
-                                    {{ $label }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('category')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+        <!-- Category Dropdown -->
+                <div class="mb-4">
+                    <label for="category" class="block text-sm text-gray-600">Categories</label>
+                    <select name="category[]" id="category" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg mt-1 text-sm" multiple>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->category_id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <div id="selected-categories" class="mt-2"></div>
+                    @error('category')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                    
+                    <!-- Tambahkan helper text -->
+                    <p class="text-sm text-gray-500 mt-1">
+                        Tahan tombol CTRL (Windows) atau CMD (Mac) untuk memilih beberapa kategori
+                    </p>
+                </div>
+        
                     <div class="flex justify-end mt-4">
                         <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg mr-4">Cancel</button>
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Upload</button>
@@ -256,10 +303,155 @@
                 </div>
             </div>
         </form>
+        
+    </div>
+</div>
+<!-- Modal Edit Album -->
+<div id="editAlbumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg w-1/2">
+        <h2 class="text-xl font-semibold mb-4">Edit Album</h2>
+        <form id="editAlbumForm" action="{{ route('admin.album.update', $album->album_id) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="mb-4">
+                <label for="editAlbumTitle" class="block text-sm text-gray-600">Album Title</label>
+                <input type="text" name="title" id="editAlbumTitle" 
+                       class="w-full px-3 py-1.5 border border-gray-300 rounded-lg mt-1" 
+                       value="{{ $album->title }}" required>
+            </div>
+            <div class="mb-4">
+                <label for="editAlbumDescription" class="block text-sm text-gray-600">Description</label>
+                <textarea name="description" id="editAlbumDescription" 
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg mt-2" 
+                          rows="4" required>{{ $album->description }}</textarea>
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button type="button" id="closeEditAlbumModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Update Album</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Delete Album -->
+<div id="deleteAlbumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg w-1/2">
+        <h2 class="text-xl font-semibold mb-4 text-red-600">Delete Album</h2>
+        <p class="text-gray-600 mb-6">Are you sure you want to delete this album? All photos in this album will also be deleted.</p>
+        <form id="deleteAlbumForm" action="{{ route('admin.album.delete', $album->album_id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <div class="flex justify-end space-x-4">
+                <button type="button" id="closeDeleteAlbumModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg">Delete Album</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
+    // Album Edit dan Delete Modal Handler
+document.addEventListener('DOMContentLoaded', function() {
+    const editAlbumModal = document.getElementById('editAlbumModal');
+    const deleteAlbumModal = document.getElementById('deleteAlbumModal');
+    const editAlbumBtn = document.getElementById('editAlbumBtn');
+    const deleteAlbumBtn = document.getElementById('deleteAlbumBtn');
+    
+    const closeEditAlbumModal = document.getElementById('closeEditAlbumModal');
+    const closeDeleteAlbumModal = document.getElementById('closeDeleteAlbumModal');
+
+    // Edit Album Modal
+    function showEditAlbumModal() {
+        editAlbumModal.classList.remove('hidden');
+    }
+
+    function hideEditAlbumModal() {
+        editAlbumModal.classList.add('hidden');
+    }
+
+    // Delete Album Modal
+    function showDeleteAlbumModal() {
+        deleteAlbumModal.classList.remove('hidden');
+    }
+
+    function hideDeleteAlbumModal() {
+        deleteAlbumModal.classList.add('hidden');
+    }
+
+    // Event Listeners
+    if (editAlbumBtn) {
+        editAlbumBtn.addEventListener('click', showEditAlbumModal);
+    }
+    if (deleteAlbumBtn) {
+        deleteAlbumBtn.addEventListener('click', showDeleteAlbumModal);
+    }
+
+    if (closeEditAlbumModal) {
+        closeEditAlbumModal.addEventListener('click', hideEditAlbumModal);
+    }
+    if (closeDeleteAlbumModal) {
+        closeDeleteAlbumModal.addEventListener('click', hideDeleteAlbumModal);
+    }
+
+    // Close modal when clicking outside
+    editAlbumModal.addEventListener('click', function(e) {
+        if (e.target === editAlbumModal) {
+            hideEditAlbumModal();
+        }
+    });
+
+    deleteAlbumModal.addEventListener('click', function(e) {
+        if (e.target === deleteAlbumModal) {
+            hideDeleteAlbumModal();
+        }
+    });
+});
+        document.addEventListener('DOMContentLoaded', function () {
+    const selectElement = document.getElementById('category');
+    let selectedCategoriesContainer = document.getElementById('selected-categories');
+    
+    // Create the container if it doesn't exist
+    if (!selectedCategoriesContainer) {
+        selectedCategoriesContainer = document.createElement('div');
+        selectedCategoriesContainer.id = 'selected-categories';
+        selectElement.parentNode.insertBefore(selectedCategoriesContainer, selectElement.nextSibling);
+    }
+    
+    // Function to render the selected categories as pills
+    function renderPills() {
+        // Clear existing pills first
+        selectedCategoriesContainer.innerHTML = '';
+        
+        const selectedOptions = Array.from(selectElement.selectedOptions);
+
+        // Loop through selected options and create pills
+        selectedOptions.forEach(option => {
+            const pill = document.createElement('span');
+            pill.classList.add('pill');
+            pill.textContent = option.text;
+            pill.id = 'pill-' + option.value;
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = '×';
+            removeButton.classList.add('remove-pill');
+            removeButton.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                option.selected = false;
+                renderPills();
+            };
+
+            pill.appendChild(removeButton);
+            selectedCategoriesContainer.appendChild(pill);
+        });
+    }
+
+    // Event listener for when user selects or unselects options
+    selectElement.addEventListener('change', renderPills);
+
+    // Initial render in case there are already selected categories
+    renderPills();
+});
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('imageModal');
     const openModalButton = document.getElementById('openModal');

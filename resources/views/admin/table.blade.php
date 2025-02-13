@@ -5,10 +5,10 @@
 @section('content')
 <nav id="navbar" class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-md">  
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">  
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">  
-            <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />  
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>  
-        </a>  
+        <a href="{{ route('admin') }}" class="flex items-center space-x-3 rtl:space-x-reverse">  
+            <img src="{{asset('images/logo.png')}}" class="h-8" alt="Flowbite Logo" />  
+            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ArtVista</span>  
+        </a>    
         <div class="flex items-center md:order-2 space-x-3 md:space-x-4 rtl:space-x-reverse">  
             <button type="button" data-collapse-toggle="navbar-search" aria-controls="navbar-search" aria-expanded="false" class="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 me-1">  
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">  
@@ -29,8 +29,16 @@
             <div class="relative hidden md:block">  
                 <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">  
                     <span class="sr-only">Open user menu</span>  
-                    <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
-                </button>  
+                    @if(Auth::user()->profile_photo)
+                        <img class="w-8 h-8 rounded-full" src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="user photo">  
+                    @else
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-sm font-bold text-gray-600">
+                                {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                            </span>
+                        </div>
+                    @endif
+                </button>
                 <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">  
                     <div class="px-4 py-3">  
                         <span class="block text-sm text-gray-900 dark:text-white">{{ Auth::user()->name }}</span>  

@@ -5,10 +5,10 @@
 @section('content')
 <nav id="navbar" class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-md">  
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">  
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">  
-            <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Flowbite Logo" />  
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>  
-        </a>  
+        <a href="{{ route('admin') }}" class="flex items-center space-x-3 rtl:space-x-reverse">  
+            <img src="{{asset('images/logo.png')}}" class="h-8" alt="Flowbite Logo" />  
+            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ArtVista</span>  
+        </a>    
         <div class="flex items-center md:order-2 space-x-3 md:space-x-4 rtl:space-x-reverse">  
             <button type="button" data-collapse-toggle="navbar-search" aria-controls="navbar-search" aria-expanded="false" class="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 me-1">  
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">  
@@ -29,8 +29,16 @@
             <div class="relative hidden md:block">  
                 <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">  
                     <span class="sr-only">Open user menu</span>  
-                    <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
-                </button>  
+                    @if(Auth::user()->profile_photo)
+                        <img class="w-8 h-8 rounded-full" src="{{ asset('storage/' . Auth::user()->profile_photo) }}" alt="user photo">  
+                    @else
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="text-sm font-bold text-gray-600">
+                                {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                            </span>
+                        </div>
+                    @endif
+                </button>
                 <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">  
                     <div class="px-4 py-3">  
                         <span class="block text-sm text-gray-900 dark:text-white">{{ Auth::user()->name }}</span>  
@@ -137,183 +145,69 @@
             Album
         </button>
     </div>
-    <div id="fotoGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        <div class="grid gap-4">
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Beautiful Sunset</h3>
-                        <p class="text-white">Likes: 150</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Mountain View</h3>
-                        <p class="text-white">Likes: 220</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">City Lights</h3>
-                        <p class="text-white">Likes: 180</p>
-                    </div>
-                </div>
-            </a>
+    <div id="fotoGrid" class="w-full px-4 py-8">
+        @if($photos->count() > 0)
+        <div class="columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+            @foreach($photos as $photo)
+            <div class="break-inside-avoid mb-6">
+                <a href="{{ route('adminBuka', $photo->photo_id) }}" 
+                   class="block transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+                    <img class="w-full h-auto rounded-lg object-cover"
+                         src="{{ asset('storage/' . $photo->image_path) }}"
+                         alt="{{ $photo->title }}"
+                         title="{{ $photo->description }}">
+                </a>
+            </div>
+            @endforeach
         </div>
-        <div class="grid gap-4">
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Lake Reflection</h3>
-                        <p class="text-white">Likes: 300</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Desert Sand</h3>
-                        <p class="text-white">Likes: 120</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Forest Path</h3>
-                        <p class="text-white">Likes: 75</p>
-                    </div>
-                </div>
-            </a>
+        @else
+        <div class="text-center py-8">
+            <p class="text-gray-500">No photos found</p>
         </div>
-        <div class="grid gap-4">
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Golden Hour</h3>
-                        <p class="text-white">Likes: 250</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-7.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Ocean Breeze</h3>
-                        <p class="text-white">Likes: 190</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-8.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Winter Wonderland</h3>
-                        <p class="text-white">Likes: 130</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="grid gap-4">
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-9.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Autumn Leaves</h3>
-                        <p class="text-white">Likes: 160</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-10.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Desert Mirage</h3>
-                        <p class="text-white">Likes: 280</p>
-                    </div>
-                </div>
-            </a>
-            <a href="" class="relative group">
-                <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-11.jpg" alt="">
-                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    <div class="flex justify-between absolute bottom-4 left-4 right-4">
-                        <h3 class="text-xl font-semibold text-white">Starry Night</h3>
-                        <p class="text-white">Likes: 310</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+        @endif
     </div>
-    
-    <!-- Modify the albumGrid div to be hidden by default -->
-    <div id="albumGrid" class="hidden space-y-6">
-    
-        <!-- Albums Grid -->
+    <div id="albumGrid" class="space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            <!-- Album 1 -->
+            @forelse($albums as $album)
             <div class="bg-gray-200 p-4 rounded-lg relative">
-                <img src="https://via.placeholder.com/150" alt="Album Thumbnail" 
-                    class="w-full h-48 object-cover rounded-t-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    onclick="window.location.href='{{ route('album') }}'">
-                <h4 class="font-semibold mt-2">Vacation 2023</h4>
-                <p class="text-sm text-gray-600 mb-10">Photos from my summer vacation</p>
-                <!-- Edit and Delete Buttons -->
-                <div class="absolute bottom-2 right-2 flex space-x-2">
-                    <button class="text-yellow-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="text-red-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                @php
+                    $latestPhoto = $album->photos->first();
+                @endphp
+                <img src="{{ $latestPhoto ? asset('storage/' . $latestPhoto->image_path) : 'https://via.placeholder.com/150' }}" 
+                     alt="{{ $album->title }} Thumbnail" 
+                     class="w-full h-48 object-cover rounded-t-lg cursor-pointer hover:opacity-90 transition-opacity"
+                     onclick="window.location.href='{{ route('adminAlbum', $album->album_id) }}'">
+                
+                <h4 class="font-semibold mt-2">{{ $album->title }}</h4>
+                <p class="text-sm text-gray-600 mb-10">{{ $album->description }}</p>
+                
+                <div class="text-sm text-gray-500 mb-2">
+                    {{ $album->photos_count }} Photos
                 </div>
-            </div>
+                <!-- Tambahkan username pembuat album -->
+                <div class="text-sm text-gray-500">
+                    Created by: {{ $album->user->username }} 
+                </div>
     
-            <!-- Album 2 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-                <img src="https://via.placeholder.com/150" alt="Album Thumbnail" 
-                    class="w-full h-48 object-cover rounded-t-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    onclick="window.location.href='{{ route('album') }}'">
-                <h4 class="font-semibold mt-2">Family Moments</h4>
-                <p class="text-sm text-gray-600 mb-10">Cherished memories with family</p>
-                <!-- Edit and Delete Buttons -->
+                <!-- Edit and Delete Buttons hanya tampil jika album milik user yang login -->
+                @if($album->user_id == Auth::id())
                 <div class="absolute bottom-2 right-2 flex space-x-2">
-                    <button class="text-yellow-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
+                    <button onclick="editAlbum({{ $album->album_id }})" 
+                            class="text-yellow-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
                         <i class="fas fa-pencil-alt"></i>
                     </button>
-                    <button class="text-red-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
+                    <button onclick="deleteAlbum({{ $album->album_id }})" 
+                            class="text-red-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
+                @endif
             </div>
-    
-            <!-- Album 3 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-                <img src="https://via.placeholder.com/150" alt="Album Thumbnail" 
-                    class="w-full h-48 object-cover rounded-t-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    onclick="window.location.href='{{ route('album') }}'">
-                <h4 class="font-semibold mt-2">Nature Photography</h4>
-                <p class="text-sm text-gray-600 mb-10">Exploring the beauty of nature</p>
-                <!-- Edit and Delete Buttons -->
-                <div class="absolute bottom-2 right-2 flex space-x-2">
-                    <button class="text-yellow-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
-                        <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button class="text-red-500 p-2 rounded-full hover:bg-gray-300 transition-colors">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+            @empty
+            <div class="col-span-full text-center py-6">
+                <p class="text-gray-500">No albums found. Create your first album!</p>
             </div>
+            @endforelse
         </div>
     </div>
 </div> 

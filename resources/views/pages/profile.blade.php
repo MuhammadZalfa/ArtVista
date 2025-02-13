@@ -101,9 +101,12 @@
                   <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>  
               </li>  
               <li class="md:hidden">  
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" id="logoutForm">
                   @csrf
-                  <a href="{{ route('logout') }}" onclick="confirmLogout(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                  <button type="submit" onclick="confirmLogout(event)" 
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white w-full text-left">
+                      Sign out
+                  </button>
               </form>
               </li>
 
@@ -121,147 +124,352 @@
   </div>  
 </nav>
 <!-- Pastikan Anda sudah menyertakan Font Awesome di dalam <head> -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Pastikan Anda sudah menyertakan Font Awesome di dalam <head> -->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <div class="bg-white w-full min-h-screen p-6 rounded-lg shadow-md flex flex-col">
-      <!-- Grid Layout for Profile and Albums -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 flex-grow">
-    
-        <!-- Left Side: Profile Section -->
-        <div class="md:col-span-1 space-y-6">
-          <!-- Avatar and Profile Info -->
+      <div class="bg-white w-full min-h-screen p-6 rounded-lg shadow-md flex flex-col">
+        <!-- Grid Layout for Profile and Albums -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 flex-grow">
+      
+          <!-- Left Side: Profile Section -->
+          <div class="md:col-span-1 space-y-6">
+            <!-- Avatar and Profile Info -->
           <div class="flex items-center space-x-4">
-            <!-- Replace the div with an img for the avatar -->
-            <img src="https://flowbite.com/docs/images/people/profile-picture-3.jpg" alt="Avatar" class="w-16 h-16 rounded-full object-cover">
-            <div>
-              <h1 class="text-2xl font-bold">Ryunix</h1>
-              <p class="text-gray-500 text-sm">Member since 2 months ago</p>
-            </div>
-          </div>
-    
-          <!-- Detail Profil Section (Placed Below Profile Info) -->
-          <div class="bg-gray-100 p-4 rounded-lg">
-            <h3 class="text-xl font-semibold">Detail Profil</h3>
-            <div class="flex flex-col space-y-4 mt-4">
+              @if(auth()->user()->profile_photo)
+                  <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                       alt="{{ auth()->user()->name }}'s Avatar" 
+                       class="w-16 h-16 rounded-full object-cover">
+              @else
+              <div class="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                      {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                  </span>
+              </div>  
+              @endif
               <div>
-                <p class="text-sm text-gray-600">Total Likes</p>
-                <p class="font-semibold">120</p>
+                  <h1 class="text-2xl font-bold">{{ auth()->user()->username }}</h1>
+                  <p class="text-gray-500 text-sm">Member since {{ auth()->user()->created_at->diffForHumans() }}</p>
+              </div>
+          </div>
+      
+          @php
+          $userStats = auth()->user()->loadCount(['likes', 'albums', 'photos']);
+      @endphp
+      
+      <div class="bg-gray-100 p-4 rounded-lg">
+          <h3 class="text-xl font-semibold">Detail Profil</h3>
+          <div class="flex flex-col space-y-4 mt-4">
+              <div>
+                  <p class="text-sm text-gray-600">Total Likes</p>
+                  <p class="font-semibold">{{ $userStats->likes_count }}</p>
               </div>
               <div>
-                <p class="text-sm text-gray-600">Total Albums</p>
-                <p class="font-semibold">5</p>
+                  <p class="text-sm text-gray-600">Total Albums</p>
+                  <p class="font-semibold">{{ $userStats->albums_count }}</p>
               </div>
               <div>
-                <p class="text-sm text-gray-600">Total Photos</p>
-                <p class="font-semibold">42</p>
+                  <p class="text-sm text-gray-600">Total Photos</p>
+                  <p class="font-semibold">{{ $userStats->photos_count }}</p>
               </div>
-            </div>
           </div>
-    
-          <!-- Action Buttons -->
-          <div class="mt-4 flex space-x-4">
-            <button class="bg-red-600 text-white px-4 py-2 rounded-lg">Share</button>
-            <button class="text-gray-600">Edit Profile</button>
-          </div>
-        </div>
-    
-        <!-- Right Side: My Albums Section -->
-        <div class="md:col-span-3 space-y-6">
-          <!-- Add Album Button -->
-          <div class="flex justify-between items-center">
-            <h3 class="text-xl font-semibold">My Albums</h3>
-            <button id="openModal" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Tambah Album</button>
-          </div>
-    
-          <!-- Albums Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            <!-- Album 1 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-              <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-              <h4 class="font-semibold mt-2">Vacation 2023</h4>
-              <p class="text-sm text-gray-600">Photos from my summer vacation</p>
-              <!-- Edit and Delete Buttons -->
-              <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-    
-            <!-- Album 2 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-              <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-              <h4 class="font-semibold mt-2">Family Moments</h4>
-              <p class="text-sm text-gray-600">Cherished memories with family</p>
-              <!-- Edit and Delete Buttons -->
-              <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-    
-            <!-- Album 3 -->
-            <div class="bg-gray-200 p-4 rounded-lg relative">
-              <img src="https://via.placeholder.com/150" alt="Album Thumbnail" class="w-full h-48 object-cover rounded-t-lg" onclick="window.location.href='{{ route('album') }}'">
-              <h4 class="font-semibold mt-2">Nature Photography</h4>
-              <p class="text-sm text-gray-600">Exploring the beauty of nature</p>
-              <!-- Edit and Delete Buttons -->
-              <div class="absolute bottom-2 right-2 flex space-x-2">
-                <button class="text-yellow-500 p-2 rounded-full">
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button class="text-red-500 p-2 rounded-full">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-    
       </div>
+      
+            <!-- Action Buttons -->
+            <div class="mt-4 flex space-x-4">
+              <button class="bg-red-600 text-white px-4 py-2 rounded-lg">Share</button>
+              <button class="text-gray-600">Edit Profile</button>
+            </div>
+          </div>
+      
+          <!-- Right Side: My Albums Section -->
+  <div class="md:col-span-3 space-y-6">
+    <div class="flex justify-between items-center">
+        <h3 class="text-xl font-semibold">My Albums</h3>
+        <button id="openModal" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Tambah Album</button>
     </div>
-    
-    <!-- Modal for Adding Album -->
-    <div id="albumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-      <div class="bg-white p-6 rounded-lg w-1/3">
-        <h2 class="text-xl font-semibold mb-4">Tambah Album</h2>
-        <form>
-          <div class="mb-4">
-            <label for="albumName" class="block text-sm text-gray-600">Nama Album</label>
-            <input type="text" id="albumName" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-          </div>
-          <div class="mb-4">
-            <label for="albumDescription" class="block text-sm text-gray-600">Deskripsi Album</label>
-            <textarea id="albumDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
-          </div>
-          <div class="flex justify-end space-x-4">
-            <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Batal</button>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Simpan</button>
-          </div>
-        </form>
-      </div>
+  
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+        @php
+        use App\Models\Photo;
+        @endphp 
+        @forelse($albums as $album)
+            <div class="bg-gray-200 p-4 rounded-lg relative">
+                <a href="{{ route('album', $album->album_id) }}">
+                    @php
+                        $firstPhoto = Photo::where('album_id', $album->album_id)
+                                         ->whereNull('deleted_at')
+                                         ->first();
+                    @endphp
+                    @if($firstPhoto && $firstPhoto->deleted_at === null)
+                        <img src="{{ asset('storage/' . $firstPhoto->image_path) }}" 
+                             alt="{{ $album->title }}" 
+                             class="w-full h-48 object-cover rounded-t-lg">
+                    @else
+                        <div class="w-full h-48 bg-gray-300 rounded-t-lg flex items-center justify-center">
+                            <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                    @endif
+                    <h4 class="font-semibold mt-2">{{ $album->title }}</h4>
+                    <p class="text-sm text-gray-600">{{ Str::limit($album->description, 28) }}</p>
+                </a>
+            </div>
+        @empty
+            <div class="col-span-3 text-center py-8">
+                <div class="bg-gray-100 rounded-lg p-6">
+                    <p class="text-gray-600 text-lg">Belum ada album yang dibuat</p>
+                    <p class="text-gray-500 mt-2">Klik tombol "Tambah Album" untuk membuat album baru</p>
+                </div>
+            </div>
+        @endforelse
     </div>
+  </div>
+        
+        <!-- Modal -->
+        <div id="albumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+            <div class="bg-white p-6 rounded-lg w-1/3">
+                <h2 class="text-xl font-semibold mb-4">Tambah Album</h2>
+                <form id="albumForm">
+                    @csrf
+                    <div class="mb-4">
+                      <label for="albumTitle" class="block text-sm text-gray-600">Nama Album</label>
+                      <input type="text" id="albumTitle" name="title" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+                  </div>
+                  <div class="mb-4">
+                      <label for="albumDescription" class="block text-sm text-gray-600">Deskripsi Album</label>
+                      <textarea id="albumDescription" name="description" class="w-full px-4 py-2 border border-gray-300 rounded-lg" required></textarea>
+                  </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Batal</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Di bagian head layout -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            // Sweet Alert Templates
+const showAddAlbumSuccess = () => {
+    Swal.fire({
+        icon: 'success',
+        title: 'Album berhasil ditambahkan',
+        text: 'Album baru telah dibuat!',
+        showConfirmButton: false,
+        timer: 1500,
+        position: 'top-end',
+        toast: true
+    });
+};
+
+const showDeleteAlbumConfirm = () => {
+    return Swal.fire({
+        title: 'Hapus Album?',
+        text: "Semua foto dalam album ini akan terhapus. Tindakan ini tidak dapat dibatalkan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    });
+};
+
+const showDeleteAlbumSuccess = () => {
+    Swal.fire({
+        icon: 'success',
+        title: 'Album Terhapus',
+        text: 'Album dan semua fotonya telah berhasil dihapus',
+        showConfirmButton: false,
+        timer: 1500,
+        position: 'top-end',
+        toast: true
+    });
+};
+
+const showValidationError = (message) => {
+    Swal.fire({
+        icon: 'error',
+        title: 'Validasi Gagal',
+        text: message || 'Mohon isi semua field dengan benar',
+        confirmButtonColor: '#ef4444'
+    });
+};
+
+const showError = (message) => {
+    Swal.fire({
+        icon: 'error',
+        title: 'Terjadi Kesalahan',
+        text: message || 'Terjadi kesalahan. Silakan coba lagi.',
+        confirmButtonColor: '#ef4444'
+    });
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const openModalButton = document.getElementById('openModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const modal = document.getElementById('albumModal');
+    const albumForm = document.getElementById('albumForm');
+    const albumTitle = document.getElementById('albumTitle');
+    const albumDescription = document.getElementById('albumDescription');
     
-    <script>
-      // Modal logic
-      const openModalButton = document.getElementById('openModal');
-      const closeModalButton = document.getElementById('closeModal');
-      const modal = document.getElementById('albumModal');
+    // Input validation function
+    const validateInput = (input, minLength = 3) => {
+        const value = input.value.trim();
+        if (value.length < minLength) {
+            input.classList.add('border-red-500');
+            return false;
+        } else {
+            input.classList.remove('border-red-500');
+            return true;
+        }
+    };
+
+    // Add real-time validation listeners
+    if (albumTitle) {
+        albumTitle.addEventListener('input', () => validateInput(albumTitle));
+    }
+    if (albumDescription) {
+        albumDescription.addEventListener('input', () => validateInput(albumDescription));
+    }
     
-      openModalButton.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-      });
+    // Modal handlers
+    if (openModalButton) {
+        openModalButton.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+        });
+    }
     
-      closeModalButton.addEventListener('click', () => {
-        modal.classList.add('hidden');
-      });
-    </script>
+    if (closeModalButton) {
+        closeModalButton.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            albumForm.reset();
+            // Reset validation styling
+            albumTitle?.classList.remove('border-red-500');
+            albumDescription?.classList.remove('border-red-500');
+        });
+    }
+    
+    // Close modal on outside click
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                albumForm.reset();
+                // Reset validation styling
+                albumTitle?.classList.remove('border-red-500');
+                albumDescription?.classList.remove('border-red-500');
+            }
+        });
+    }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+            albumForm.reset();
+            // Reset validation styling
+            albumTitle?.classList.remove('border-red-500');
+            albumDescription?.classList.remove('border-red-500');
+        }
+    });
+    
+    // Form submission handler
+    if (albumForm) {
+        albumForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate all inputs
+            const isTitleValid = validateInput(albumTitle);
+            const isDescriptionValid = validateInput(albumDescription);
+            
+            if (!isTitleValid || !isDescriptionValid) {
+                showValidationError('Mohon isi semua field dengan minimal 3 karakter');
+                return;
+            }
+            
+            // Disable submit button
+            const submitButton = albumForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            
+            try {
+                const formData = new FormData(albumForm);
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+                
+                const response = await fetch('/album', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    modal.classList.add('hidden');
+                    albumForm.reset();
+                    showAddAlbumSuccess();
+                    
+                    // Reload after success message
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error(data.message || 'Gagal membuat album');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError(error.message);
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+    }
+
+    // Delete album handler
+    const deleteButtons = document.querySelectorAll('[data-delete-album]');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const albumId = button.dataset.albumId;
+            
+            const result = await showDeleteAlbumConfirm();
+            
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/album/${albumId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showDeleteAlbumSuccess();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Gagal menghapus album');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError(error.message);
+                }
+            }
+        });
+    });
+});
+
+// Network error handler
+const handleNetworkError = (error) => {
+    console.error('Network Error:', error);
+    showError('Terjadi kesalahan jaringan. Silakan coba lagi.');
+};
+        </script>
     
 @endsection

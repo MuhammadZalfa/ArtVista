@@ -30,7 +30,17 @@
                     <div class="relative hidden md:block">  
                         <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">  
                             <span class="sr-only">Open user menu</span>  
-                            <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                            @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif  
                         </button>  
                         <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">  
                             <div class="px-4 py-3">  
@@ -91,7 +101,17 @@
                         @auth
                         <li class="md:hidden border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">  
                             <div class="flex items-center px-4 py-2 space-x-3">  
-                                <img class="w-10 h-10 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                                @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif
                                 <div>  
                                     <span class="block text-sm text-gray-900 dark:text-white">{{ Auth::user()->name }}</span>  
                                     <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ Auth::user()->email }}</span>  
@@ -102,9 +122,12 @@
                             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Settings</a>  
                         </li>  
                         <li class="md:hidden">  
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST" action="{{ route('logout') }}" id="logoutForm">
                                 @csrf
-                                <a href="{{ route('logout') }}" onclick="confirmLogout(event)" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                                <button type="submit" onclick="confirmLogout(event)" 
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white w-full text-left">
+                                    Sign out
+                                </button>
                             </form>
                         </li>
                         @endauth
@@ -122,51 +145,25 @@
         </nav>
 
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4"> <!-- Add margin here as well -->  
-            <div class="grid gap-4">  
-                <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg" alt="">  
-                </a>  
-                <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg" alt="">  
-                </a>  
-                <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg" alt="">  
-                </a>  
-            </div>  
-            <div class="grid gap-4">  
-                <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg" alt="">  
-                </a>  
-                <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg" alt="">  
-                </a>  
-                <a href="{{ route('buka') }}" class="hover:scale-[1.1] hover:shadow-lg duration-300">  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg" alt="">  
-                </a>  
-            </div>  
-            <div class="grid gap-4">  
-                <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg" alt="">  
-                </a>  
-                <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-7.jpg" alt="">  
-                </a>  
-                <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-8.jpg" alt="">  
-                </a>  
-            </div>  
-            <div class="grid gap-4">  
-                <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-9.jpg" alt="">  
-                </a>  
-                <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-10.jpg" alt="">  
-                </a>  
-                <a href="{{route('buka')}}" class="hover:scale-[1.1] hover:shadow-lg duration-300" >  
-                    <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-11.jpg" alt="">  
-                </a>  
-            </div>  
-            <!-- Lanjutkan pola ini untuk semua elemen gambar lainnya -->
-        </div>    
+        <div id="fotoGrid" class="w-full px-4 py-8">
+            @if($photos->count() > 0)
+            <div class="columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+                @foreach($photos as $photo)
+                <div class="break-inside-avoid mb-6">
+                    <a href="{{ route('buka', $photo->photo_id) }}" 
+                       class="block transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg">
+                        <img class="w-full h-auto rounded-lg object-cover"
+                             src="{{ asset('storage/' . $photo->image_path) }}"
+                             alt="{{ $photo->title }}"
+                             title="{{ $photo->description }}">
+                    </a>
+                </div>
+                @endforeach
+            </div>
+            @else
+            <div class="text-center py-8">
+                <p class="text-gray-500">No photos found</p>
+            </div>
+            @endif
+        </div>
     @endsection

@@ -49,7 +49,7 @@
 </head>
 <body class="bg-gray-100 text-gray-900">
 
-    <nav id="navbar" class="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 shadow-md">  
+    <nav id="navbar" class="border-gray-200 dark:bg-gray-900 fixed top-0 w-full z-50 shadow-md transition-all duration-300 ease-in-out md:invisible md:opacity-0 md:-translate-y-full">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">  
             <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">  
                 <img src="{{asset('images/logo.png')}}" class="h-8" alt="Flowbite Logo" />  
@@ -75,7 +75,17 @@
                 <div class="relative hidden md:block">  
                     <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">  
                         <span class="sr-only">Open user menu</span>  
-                        <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                        @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif
                     </button>  
                     <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">  
                         <div class="px-4 py-3">  
@@ -136,7 +146,17 @@
                     @auth
                     <li class="md:hidden border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">  
                         <div class="flex items-center px-4 py-2 space-x-3">  
-                            <img class="w-10 h-10 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                            @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif
                             <div>  
                                 <span class="block text-sm text-gray-900 dark:text-white">{{ Auth::user()->name }}</span>  
                                 <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ Auth::user()->email }}</span>  
@@ -182,10 +202,10 @@
     <div class="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
         <div class="md:flex md:justify-between">
           <div class="mb-6 md:mb-0">
-              <a href="https://flowbite.com/" class="flex items-center">
-                  <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 me-3" alt="FlowBite Logo" />
-                  <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
-              </a>
+            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">  
+                <img src="{{asset('images/logo.png')}}" class="h-8 me-3" alt="Flowbite Logo" />  
+                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">ArtVista</span>  
+            </a>  
           </div>
           <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
               <div>
@@ -263,24 +283,27 @@
     </div>
 </footer>
 
-<script>  
-    let lastScrollTop = 0;  
-    const navbar = document.getElementById("navbar");  
-    const scrollThreshold = 100; // Tentukan jarak scroll sebelum navbar muncul  
+<script>
+    let lastScrollTop = 0;
+    const navbar = document.getElementById("navbar");
+    const scrollThreshold = 100; // Jarak scroll sebelum navbar muncul
 
-    window.addEventListener("scroll", function () {  
-        let currentScroll = window.pageYOffset || document.documentElement.scrollTop;  
+    window.addEventListener("scroll", function () {
+        let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-        // Munculkan navbar jika sudah scroll lebih dari threshold  
-        if (currentScroll > scrollThreshold) {  
-            navbar.classList.remove("hidden");  
-        } else {  
-            // Sembunyikan navbar jika kembali ke posisi awal  
-            navbar.classList.add("hidden");  
-        }  
+        // Hanya terapkan efek pada layar besar (md: 768px ke atas)
+        if (window.innerWidth >= 768) {
+            if (currentScroll > scrollThreshold) {
+                // Navbar muncul dengan efek slide down yang halus
+                navbar.classList.remove("md:invisible", "md:opacity-0", "md:-translate-y-full");
+            } else {
+                // Navbar slide up dengan opacity turun
+                navbar.classList.add("md:invisible", "md:opacity-0", "md:-translate-y-full");
+            }
+        }
 
-        lastScrollTop = currentScroll;  
-    });  
+        lastScrollTop = currentScroll;
+    });
 </script>
 
 <script>

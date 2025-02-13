@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Photo;
+use App\Models\Album;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -70,22 +73,29 @@ class AuthController extends Controller
     
         return redirect()->back()->with('error', 'Invalid credentials. Please try again.');
     }
-    
-
-    
-
-    // Halaman welcome untuk user
-    public function welcome()
-    {
-        return view('welcome');
-    }
 
     // Halaman admin
     public function admin()
-    {
-        return view('admin.admin');
-    }
+{
+    \Log::info('Fetching albums');
+    $albums = Album::with(['photos' => function($query) {
+        $query->latest()->limit(1); // Get the latest photo for each album
+    }])
+    ->where('user_id', Auth::id())
+    ->withCount('photos')
+    ->orderBy('created_at', 'desc')
+    ->get();
 
+    \Log::info('Albums count: ' . $albums->count());
+    
+    $photos = Photo::select('photos.*')
+        ->withCount('likes')
+        ->with('album')
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
+    return view('admin.admin', compact('albums', 'photos'));
+}
     // Fungsi untuk registrasi
     public function register(Request $request)
     {
@@ -115,17 +125,12 @@ class AuthController extends Controller
     }
     // AuthController.php
 
-public function logout(Request $request)
-{
-    // Log out the user
-    Auth::logout();
-
-    // Clear the session data
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    // Redirect to login page after logout
-    return redirect()->route('login')->with('success', 'You have logged out successfully!');
-}
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
+    }
 
 }

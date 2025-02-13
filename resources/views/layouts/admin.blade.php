@@ -41,6 +41,8 @@
     </style>  
 </head>
 <body class="bg-gray-100 text-gray-900">
+        <!-- ... -->
+        @stack('scripts')
     <!-- Header -->
     <div class="main">
         @yield('content')
