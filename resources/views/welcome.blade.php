@@ -28,9 +28,13 @@
             <a href="{{route('welcome')}}" class="text-black hover:text-white hover:border-b font-francois">Homepage</a>  
             <a href="{{route('dashboard')}}" class="text-black hover:text-white hover:border-b font-francois">Photos</a>  
             <a href="#" class="text-black hover:text-white hover:border-b font-francois">Discover Albums</a>  
-            <a href="{{ route('login') }}" class="bg-[#DE8F5F] text-white text-lg px-6 py-2 rounded-full hover:scale-110 duration-300 hover:bg-[#DE8F5F]">Login</a>  
+            @auth
+                <a href="{{ route('profile') }}" class="bg-[#DE8F5F] text-white text-lg px-6 py-2 rounded-full hover:scale-110 duration-300 hover:bg-[#DE8F5F]">Profile</a>
+            @else
+                <a href="{{ route('login') }}" class="bg-[#DE8F5F] text-white text-lg px-6 py-2 rounded-full hover:scale-110 duration-300 hover:bg-[#DE8F5F]">Login</a>
+            @endauth
         </nav>
-    </div>  
+    </div>
     <!-- Konten Utama -->  
     <div class="flex flex-col justify-center items-center">  
         <h1 class="font-francois text-[30px] md:text-[70px] text-[40px] font-reguler mb-4">ABADIKAN MOMENT <br> BERHARGA MU DI <br> ART VISTA</h1>  

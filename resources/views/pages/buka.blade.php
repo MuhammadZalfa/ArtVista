@@ -4,6 +4,7 @@
 
 @section('content')
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>  
         /* Custom scrollbar styles */  
         .scrollbar-thin::-webkit-scrollbar {  
@@ -190,24 +191,24 @@
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex space-x-4">
                         <!-- Like Button HTML --> 
-                    <button onclick="toggleLike({{ $photo->photo_id }})" 
-                        id="likeButton-{{ $photo->photo_id }}"
-                        class="flex items-center space-x-1 {{ $isLiked ? 'text-[#B89263]' : 'text-gray-600' }} hover:text-[#B89263]"
-                        data-liked="{{ $isLiked ? 'true' : 'false' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                        width="24" height="24" 
-                        viewBox="0 0 24 24" 
-                        fill="{{ $isLiked ? '#B89263' : 'none' }}" 
-                        stroke="currentColor" 
-                        stroke-width="2" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        class="lucide lucide-heart"
-                        id="heartIcon-{{ $photo->photo_id }}">
-                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                    </svg>
-                    <span id="likeCount-{{ $photo->photo_id }}">{{ $likeCount }}</span>
-                    </button>
+                        <form action="{{ route('photos.toggle-like', $photo->photo_id) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" 
+                                class="flex items-center space-x-1 {{ $isLiked ? 'text-[#B89263]' : 'text-gray-600' }} hover:text-[#B89263]">
+                                <svg xmlns="http://www.w3.org/2000/svg" 
+                                    width="24" height="24" 
+                                    viewBox="0 0 24 24" 
+                                    fill="{{ $isLiked ? '#B89263' : 'none' }}" 
+                                    stroke="currentColor" 
+                                    stroke-width="2" 
+                                    stroke-linecap="round" 
+                                    stroke-linejoin="round" 
+                                    class="lucide lucide-heart">
+                                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                                </svg>
+                                <span>{{ $likeCount }}</span>
+                            </button>
+                        </form>
                     
                         <!-- Share Button -->
                         <button onclick="sharePhoto({{ $photo->photo_id }})" 
@@ -389,61 +390,6 @@
     function closeEditModal() {
         document.getElementById('editPhotoModal').classList.add('hidden');
     }
-
-    function toggleLike(photoId) {
-    // Get the button and icon elements
-    const button = document.getElementById(`likeButton-${photoId}`);
-    const heartIcon = document.getElementById(`heartIcon-${photoId}`);
-    const likeCountElement = document.getElementById(`likeCount-${photoId}`);
-    
-    // Disable button during request
-    button.disabled = true;
-
-    fetch(`/photos/open/${photoId}/toggle-like`, {  // Updated route path
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Update like count
-            likeCountElement.textContent = data.likeCount;
-            
-            // Toggle heart icon fill and color
-            if (data.action === 'liked') {
-                heartIcon.setAttribute('fill', '#B89263');
-                button.classList.remove('text-gray-600');
-                button.classList.add('text-[#B89263]');
-                button.dataset.liked = 'true';
-            } else {
-                heartIcon.setAttribute('fill', 'none');
-                button.classList.remove('text-[#B89263]');
-                button.classList.add('text-gray-600');
-                button.dataset.liked = 'false';
-            }
-        } else {
-            console.error('Failed to toggle like');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        // Re-enable button after request completes
-        button.disabled = false;
-    });
-}
-
 </script>
 <script>
 function confirmDelete(photoId) {

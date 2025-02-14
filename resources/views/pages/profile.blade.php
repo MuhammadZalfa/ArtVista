@@ -29,7 +29,17 @@
           <div class="relative hidden md:block">  
               <button type="button" class="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">  
                   <span class="sr-only">Open user menu</span>  
-                  <img class="w-8 h-8 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                  @if(auth()->user()->profile_photo)
+                        <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                            alt="{{ auth()->user()->name }}'s Avatar" 
+                            class="w-8 h-8 rounded-full object-cover">
+                        @else
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                            <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                                {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                            </span>
+                        </div>  
+                        @endif  
               </button>  
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">  
                   <div class="px-4 py-3">  
@@ -90,7 +100,17 @@
               @auth
               <li class="md:hidden border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">  
                   <div class="flex items-center px-4 py-2 space-x-3">  
-                      <img class="w-10 h-10 rounded-full" src="{{ Auth::user()->profile_photo_url ?? 'https://flowbite.com/docs/images/people/profile-picture-3.jpg' }}" alt="user photo">  
+                    @if(auth()->user()->profile_photo)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                        alt="{{ auth()->user()->name }}'s Avatar" 
+                        class="w-8 h-8 rounded-full object-cover">
+                    @else
+                    <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span class="md:text-2xl sm:text-sm font-bold text-gray-600">
+                            {{ strtoupper(substr(Auth::user()->username, 0, 1)) }}
+                        </span>
+                    </div>  
+                    @endif
                       <div>  
                           <span class="block text-sm text-gray-900 dark:text-white">{{ Auth::user()->name }}</span>  
                           <span class="block text-sm text-gray-500 truncate dark:text-gray-400">{{ Auth::user()->email }}</span>  
@@ -153,31 +173,38 @@
           </div>
       
           @php
-          $userStats = auth()->user()->loadCount(['likes', 'albums', 'photos']);
+           $totalLikes = \App\Models\Like::join('photos', 'likes.photo_id', '=', 'photos.photo_id')
+                     ->where('photos.user_id', Auth::id())
+                     ->count();
+                     
+    $userStats = (object)[
+        'albums_count' => $albums->count(),
+        'photos_count' => \App\Models\Photo::where('user_id', Auth::id())->count(),
+        'total_likes_received' => $totalLikes
+    ];
       @endphp
       
       <div class="bg-gray-100 p-4 rounded-lg">
-          <h3 class="text-xl font-semibold">Detail Profil</h3>
-          <div class="flex flex-col space-y-4 mt-4">
-              <div>
-                  <p class="text-sm text-gray-600">Total Likes</p>
-                  <p class="font-semibold">{{ $userStats->likes_count }}</p>
-              </div>
-              <div>
-                  <p class="text-sm text-gray-600">Total Albums</p>
-                  <p class="font-semibold">{{ $userStats->albums_count }}</p>
-              </div>
-              <div>
-                  <p class="text-sm text-gray-600">Total Photos</p>
-                  <p class="font-semibold">{{ $userStats->photos_count }}</p>
-              </div>
-          </div>
-      </div>
-      
+        <h3 class="text-xl font-semibold">Detail Profil</h3>
+        <div class="flex flex-col space-y-4 mt-4">
+            <div>
+                <p class="text-sm text-gray-600">Total Likes</p>
+                <p class="font-semibold">{{ $userStats->total_likes_received }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Total Albums</p>
+                <p class="font-semibold">{{ $userStats->albums_count }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600">Total Photos</p>
+                <p class="font-semibold">{{ $userStats->photos_count }}</p>
+            </div>
+        </div>
+    </div>
             <!-- Action Buttons -->
             <div class="mt-4 flex space-x-4">
-              <button class="bg-red-600 text-white px-4 py-2 rounded-lg">Share</button>
-              <button class="text-gray-600">Edit Profile</button>
+                <button class="bg-red-600 text-white px-4 py-2 rounded-lg">Share</button>
+                <button id="openEditProfileModal" class="text-gray-600">Edit Profile</button>
             </div>
           </div>
       
@@ -225,7 +252,80 @@
         @endforelse
     </div>
   </div>
-        
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+    <div class="bg-white p-8 rounded-xl shadow-2xl w-[500px] max-w-full">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Edit Profile</h2>
+            <button id="closeEditProfileModal" class="text-gray-500 hover:text-gray-700 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="editProfileForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+            @method('PUT')
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                    <input type="text" id="name" name="name" value="{{ auth()->user()->name }}" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                </div>
+
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username" name="username" value="{{ auth()->user()->username }}" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+                </div>
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="email" name="email" value="{{ auth()->user()->email }}" 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" required>
+            </div>
+
+            <div>
+                <label for="profile_photo" class="block text-sm font-medium text-gray-700 mb-2">Profile Photo</label>
+                <div class="flex items-center space-x-4">
+                    <input type="file" id="profile_photo" name="profile_photo" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-blue-700 hover:file:bg-blue-100 transition-all"
+                           accept="image/*">
+                    @if(auth()->user()->profile_photo)
+                        <div class="w-16 h-16 rounded-full overflow-hidden">
+                            <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" alt="Current Profile Photo" class="w-full h-full object-cover">
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">New Password (optional)</label>
+                    <input type="password" id="password" name="password" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-4">
+                <button type="button" id="closeEditProfileModal" 
+                        class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
         <!-- Modal -->
         <div id="albumModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
             <div class="bg-white p-6 rounded-lg w-1/3">
@@ -307,12 +407,77 @@ const showError = (message) => {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    const editProfileButton = document.getElementById('openEditProfileModal');
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfileModal = document.getElementById('closeEditProfileModal');
+    const editProfileForm = document.getElementById('editProfileForm');
+
+    // Open modal
+    if (editProfileButton) {
+        editProfileButton.addEventListener('click', () => {
+            editProfileModal.classList.remove('hidden');
+        });
+    }
+
+    // Close modal
+    closeEditProfileModal.addEventListener('click', () => {
+        editProfileModal.classList.add('hidden');
+    });
+
+    // Close on outside click
+    editProfileModal.addEventListener('click', (e) => {
+        if (e.target === editProfileModal) {
+            editProfileModal.classList.add('hidden');
+        }
+    });
+
+    // Form submission
+    editProfileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(editProfileForm);
+        
+        try {
+            const response = await fetch(editProfileForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profile Updated',
+                    text: 'Your profile has been successfully updated!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                throw new Error(data.message || 'Failed to update profile');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'An error occurred while updating your profile'
+            });
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const openModalButton = document.getElementById('openModal');
     const closeModalButton = document.getElementById('closeModal');
     const modal = document.getElementById('albumModal');
     const albumForm = document.getElementById('albumForm');
-    const albumTitle = document.getElementById('albumTitle');
+    const albumTitle = document.getElementById('albumTitle');   
     const albumDescription = document.getElementById('albumDescription');
     
     // Input validation function

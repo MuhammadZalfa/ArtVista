@@ -85,6 +85,8 @@ Route::post('/photos/open/{id}/toggle-like', [AlbumController::class, 'toggleLik
 
 Route::get('/profile', [AlbumController::class, 'userIndex'])->name('profile');
 
+Route::put('/profile/update', [AlbumController::class, 'updateProfile'])->name('profile.update');
+
 Route::post('/album', [AlbumController::class, 'storeAlbum'])->name('album.store');
 
 Route::post('/user/photos', [AlbumController::class, 'storePhoto'])->name('user.photos.store');

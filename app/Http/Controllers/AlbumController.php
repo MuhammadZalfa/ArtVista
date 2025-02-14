@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
 use App\Models\Album;
 use App\Models\Photo;
 use App\Models\Category;
 use App\Models\Comment;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -14,15 +18,31 @@ use Illuminate\Support\Facades\Log;
 class AlbumController extends Controller
 {
     public function userIndex()
-    {
-        try {
-            $albums = Album::where('user_id', Auth::id())->latest()->get();
-            return view('pages.profile', compact('albums'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching user albums: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Gagal memuat album');
-        }
+{
+    try {
+        $userId = Auth::id();
+        
+        // Get albums and photos owned by user
+        $albums = Album::where('user_id', $userId)->latest()->get();
+        
+        // Get total likes from photos owned by the user
+        $totalLikes = Like::join('photos', 'likes.photo_id', '=', 'photos.photo_id')
+                         ->where('photos.user_id', $userId)
+                         ->count();
+
+        $userStats = (object)[
+            'albums_count' => $albums->count(),
+            'photos_count' => Photo::where('user_id', $userId)->count(),
+            'total_likes_received' => $totalLikes
+        ];
+
+        return view('pages.profile', compact('albums', 'userStats'));
+        
+    } catch (\Exception $e) {
+        Log::error('Error fetching user albums: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Gagal memuat album');
     }
+}
 
     public function storeAlbum(Request $request)
     {
@@ -215,10 +235,12 @@ class AlbumController extends Controller
     }
 
     // Add this method to AlbumController.php
-public function toggleLike($photoId)
+    public function toggleLike($photoId)
 {
     try {
         $userId = Auth::id();
+        Log::info('Toggle Like - User ID: ' . $userId . ', Photo ID: ' . $photoId);
+        
         $photo = Photo::findOrFail($photoId);
         
         $existingLike = Like::where('user_id', $userId)
@@ -226,29 +248,20 @@ public function toggleLike($photoId)
             ->first();
 
         if ($existingLike) {
+            Log::info('Deleting existing like');
             $existingLike->delete();
-            $action = 'unliked';
         } else {
+            Log::info('Creating new like');
             Like::create([
                 'user_id' => $userId,
                 'photo_id' => $photoId
             ]);
-            $action = 'liked';
         }
 
-        $newLikeCount = $photo->likes()->count();
-
-        return response()->json([
-            'success' => true,
-            'action' => $action,
-            'likeCount' => $newLikeCount
-        ]);
+        return redirect()->back();
     } catch (\Exception $e) {
         Log::error('Error toggling like: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to process like'
-        ], 500);
+        return redirect()->back()->with('error', 'Failed to process like');
     }
 }
 
@@ -368,6 +381,76 @@ public function toggleLike($photoId)
             Log::error('Error deleting album: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Gagal menghapus album: ' . $e->getMessage());
+        }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'username' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('users')->ignore($user->id)
+                ],
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('users')->ignore($user->id)
+                ],
+                'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'password' => 'nullable|string|min:8|confirmed'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $data = [
+                'name' => $request->name,
+                'username' => $request->username,
+                'email' => $request->email,
+            ];
+
+            // Handle password update
+            if ($request->filled('password')) {
+                $data['password'] = Hash::make($request->password);
+            }
+
+            // Handle profile photo upload
+            if ($request->hasFile('profile_photo')) {
+                // Delete old photo if exists
+                if ($user->profile_photo) {
+                    Storage::disk('public')->delete($user->profile_photo);
+                }
+
+                $path = $request->file('profile_photo')->store('profile_photos', 'public');
+                $data['profile_photo'] = $path;
+            }
+
+            $user->update($data);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'user' => $user
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update profile: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
